@@ -1,786 +1,496 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>Korvil · HealthTech intelligence</title>
-  <!-- Poppins & Inter hybrid -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>KORVIL · Workforce Attendance System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@300;400;500&family=Sora:wght@300;400;600;700&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg-base: #060d1f;
+    --bg-layer: #0f172a;
+    --bg-card: rgba(15,23,42,0.85);
+    --blue-deep: #1e3a8a;
+    --blue-mid: #2563eb;
+    --blue-bright: #3b82f6;
+    --cyan: #06b6d4;
+    --cyan-dim: rgba(6,182,212,0.15);
+    --text-primary: #e2e8f0;
+    --text-secondary: #94a3b8;
+    --text-muted: #475569;
+    --border: rgba(59,130,246,0.18);
+    --border-subtle: rgba(255,255,255,0.06);
+    --glass: rgba(14,22,42,0.7);
+    --success: #10b981;
+    --error: #ef4444;
+    --warning: #f59e0b;
+    --font-ui: 'DM Sans', sans-serif;
+    --font-display: 'Sora', sans-serif;
+    --font-mono: 'DM Mono', monospace;
+    --radius: 12px;
+    --radius-lg: 20px;
+    --shadow: 0 4px 32px rgba(0,0,0,0.4);
+    --shadow-glow: 0 0 40px rgba(59,130,246,0.12);
+  }
 
-    body {
-      font-family: 'Inter', 'Poppins', sans-serif;
-      background: radial-gradient(circle at 30% 10%, #1e3a8a, #0f172a 80%);
-      min-height: 100vh;
-      color: #ffffff;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-      overflow-x: hidden;
-    }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    /* animated gradient + noise texture */
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJmIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iLjc1IiBudW1PY3RhdmVzPSIzIi8+PC9maWx0ZXI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsdGVyPSJ1cmwoI2YpIiBvcGFjaXR5PSIwLjA0Ii8+PC9zdmc+');
-      opacity: 0.35;
-      pointer-events: none;
-      z-index: 0;
-    }
+  html { scroll-behavior: smooth; }
 
-    /* floating blurred orbs */
-    .bg-orb {
-      position: fixed;
-      width: 60vmax;
-      height: 60vmax;
-      border-radius: 50%;
-      background: radial-gradient(circle at 30% 30%, #3b82f6, #1e3a8a);
-      filter: blur(120px);
-      opacity: 0.3;
-      z-index: -1;
-      animation: floatOrb 24s infinite alternate ease-in-out;
-    }
-    .orb1 { top: -20vh; left: -10vw; background: #2563eb; }
-    .orb2 { bottom: -10vh; right: -5vw; width: 80vmax; height: 80vmax; background: #0f172a; filter: blur(140px); opacity: 0.5; animation-duration: 30s; }
-    @keyframes floatOrb {
-      0% { transform: translate(0,0) scale(1); }
-      100% { transform: translate(5%, 8%) scale(1.1); }
-    }
+  body {
+    font-family: var(--font-ui);
+    background: var(--bg-base);
+    color: var(--text-primary);
+    min-height: 100vh;
+    overflow-x: hidden;
+    line-height: 1.6;
+  }
 
-    /* main containers */
-    #loginView {
-      position: fixed;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 100;
-      backdrop-filter: blur(12px);
-      transition: opacity 0.8s cubic-bezier(0.23, 1, 0.32, 1), transform 0.8s cubic-bezier(0.23, 1, 0.32, 1), filter 0.6s;
-      will-change: transform, opacity;
-    }
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: var(--bg-base); }
+  ::-webkit-scrollbar-thumb { background: var(--blue-deep); border-radius: 99px; }
 
-    #loginView.hidden-login {
-      opacity: 0;
-      transform: scale(0.96) translateY(10px);
-      pointer-events: none;
-      filter: blur(8px);
-      transition: opacity 0.7s, transform 0.8s, filter 0.6s;
-    }
+  /* AUTH PAGE */
+  #auth-page {
+    position: fixed; inset: 0; z-index: 1000;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--bg-base);
+    transition: opacity 0.8s ease, filter 0.8s ease;
+  }
+  #auth-page.exit { opacity: 0; filter: blur(12px); pointer-events: none; }
 
-    #mainApp {
-      opacity: 0;
-      transform: translateY(30px);
-      transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
-      will-change: transform, opacity;
-      position: relative;
-      z-index: 10;
-    }
+  .auth-bg {
+    position: absolute; inset: 0; overflow: hidden; pointer-events: none;
+  }
+  .auth-bg::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(59,130,246,0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(59,130,246,0.05) 1px, transparent 1px);
+    background-size: 48px 48px;
+    animation: gridShift 30s linear infinite;
+  }
+  .auth-bg::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 80% 60% at 50% 40%, rgba(30,58,138,0.35) 0%, transparent 70%);
+  }
+  @keyframes gridShift { from { transform: translate(0,0); } to { transform: translate(48px,48px); } }
 
-    #mainApp.visible-app {
-      opacity: 1;
-      transform: translateY(0);
-    }
+  .orb {
+    position: absolute; border-radius: 50%;
+    filter: blur(80px); opacity: 0.18; pointer-events: none;
+    animation: orbFloat 12s ease-in-out infinite alternate;
+  }
+  .orb-1 { width: 500px; height: 500px; background: #1e3a8a; top: -120px; left: -100px; animation-delay: 0s; }
+  .orb-2 { width: 400px; height: 400px; background: #06b6d4; bottom: -80px; right: -60px; animation-delay: -5s; }
+  .orb-3 { width: 300px; height: 300px; background: #3b82f6; top: 40%; left: 60%; animation-delay: -9s; }
+  @keyframes orbFloat { from { transform: translate(0,0) scale(1); } to { transform: translate(30px,40px) scale(1.08); } }
 
-    /* ---------- LOGIN CARD (glassmorphism + sliding panel) ---------- */
-    .login-card {
-      width: 960px;
-      max-width: 94vw;
-      height: 640px;
-      max-height: 90vh;
-      background: rgba(15, 23, 42, 0.25);
-      backdrop-filter: blur(30px);
-      -webkit-backdrop-filter: blur(30px);
-      border-radius: 36px;
-      box-shadow: 0 30px 60px -10px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(59, 130, 246, 0.15), 0 0 40px rgba(59, 130, 246, 0.2);
-      display: flex;
-      position: relative;
-      overflow: hidden;
-      border: 1px solid rgba(255,255,255,0.06);
-    }
+  .auth-card {
+    position: relative; z-index: 10;
+    width: 100%; max-width: 440px;
+    margin: 0 16px;
+    background: var(--glass);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 48px 44px;
+    backdrop-filter: blur(24px) saturate(1.4);
+    box-shadow: var(--shadow), var(--shadow-glow), inset 0 1px 0 rgba(255,255,255,0.06);
+    overflow: hidden;
+  }
+  .auth-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+    opacity: 0.6;
+  }
+  .auth-brand {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 36px;
+  }
+  .auth-brand-logo {
+    width: 38px; height: 38px;
+    background: linear-gradient(135deg, var(--blue-mid), var(--cyan));
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-display); font-size: 14px; font-weight: 700;
+    letter-spacing: 1px; color: #fff;
+    box-shadow: 0 4px 16px rgba(59,130,246,0.3);
+  }
+  .auth-brand-name {
+    font-family: var(--font-display); font-size: 15px; font-weight: 600;
+    letter-spacing: 2.5px; color: var(--text-primary);
+    text-transform: uppercase;
+  }
+  .auth-brand-tag {
+    font-size: 10px; font-family: var(--font-mono);
+    color: var(--text-muted); letter-spacing: 1px;
+    text-transform: uppercase; display: block;
+    margin-top: 1px;
+  }
+  .auth-title {
+    font-family: var(--font-display); font-size: 26px; font-weight: 600;
+    color: var(--text-primary); margin-bottom: 6px;
+    letter-spacing: -0.3px;
+    transition: opacity 0.25s ease;
+  }
+  .auth-sub {
+    font-size: 13.5px; color: var(--text-secondary); margin-bottom: 32px;
+    transition: opacity 0.25s ease;
+  }
 
-    .forms-container {
-      display: flex;
-      width: 100%;
-      height: 100%;
-      transition: transform 0.65s cubic-bezier(0.77, 0, 0.175, 1);
-    }
+  /* sliding container */
+  .form-window {
+    overflow: hidden;
+    transition: height 0.45s cubic-bezier(0.77, 0, 0.175, 1);
+  }
+  .form-slide {
+    transition: transform 0.45s cubic-bezier(0.77, 0, 0.175, 1);
+    will-change: transform;
+  }
+  .auth-panel { padding-bottom: 2px; }
+  .role-indicator {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 12px;
+    background: var(--cyan-dim);
+    border: 1px solid rgba(6,182,212,0.25);
+    border-radius: 99px;
+    font-size: 11px; font-family: var(--font-mono);
+    color: var(--cyan); letter-spacing: 1.5px; text-transform: uppercase;
+    margin-bottom: 24px;
+  }
+  .role-indicator .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--cyan);
+    box-shadow: 0 0 6px var(--cyan);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  .role-indicator.admin-mode { background: rgba(37,99,235,0.15); border-color: rgba(37,99,235,0.3); color: var(--blue-bright); }
+  .role-indicator.admin-mode .dot { background: var(--blue-bright); box-shadow: 0 0 6px var(--blue-bright); }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
 
-    .form-side {
-      flex: 1;
-      padding: 48px 40px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      transition: opacity 0.3s, transform 0.45s;
-    }
+  .field-group { margin-bottom: 18px; }
+  .field-label {
+    display: block; font-size: 11.5px; font-family: var(--font-mono);
+    color: var(--text-muted); letter-spacing: 1.2px; text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .field-input {
+    width: 100%;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px;
+    padding: 13px 16px;
+    color: var(--text-primary);
+    font-family: var(--font-ui); font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+  }
+  .field-input:focus {
+    border-color: var(--blue-bright);
+    background: rgba(59,130,246,0.06);
+    box-shadow: 0 0 0 3px rgba(59,130,246,0.12);
+  }
+  .field-input::placeholder { color: var(--text-muted); }
 
-    .login-side { background: transparent; }
-    .register-side { background: transparent; }
+  .btn-primary {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, var(--blue-mid), var(--blue-bright));
+    border: none; border-radius: 10px;
+    color: #fff; font-family: var(--font-display);
+    font-size: 14px; font-weight: 600;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 4px 20px rgba(37,99,235,0.35);
+    margin-top: 8px;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .btn-primary:hover { transform: scale(1.02); box-shadow: 0 6px 28px rgba(37,99,235,0.5); }
+  .btn-primary:active { transform: scale(0.99); }
 
-    .form-side h2 {
-      font-size: 2.5rem;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      margin-bottom: 8px;
-      background: linear-gradient(135deg, #ffffff, #b1d0ff);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-    }
+  .btn-google {
+    width: 100%;
+    padding: 13px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px;
+    color: var(--text-primary); font-family: var(--font-ui);
+    font-size: 14px; font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    margin-bottom: 14px;
+  }
+  .btn-google:hover { background: rgba(255,255,255,0.09); transform: scale(1.01); border-color: rgba(255,255,255,0.12); }
+  .divider {
+    display: flex; align-items: center; gap: 12px;
+    margin: 16px 0;
+    color: var(--text-muted); font-size: 11px; font-family: var(--font-mono);
+    letter-spacing: 1px; text-transform: uppercase;
+  }
+  .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border-subtle); }
+  .toggle-text {
+    text-align: center; margin-top: 24px;
+    font-size: 13px; color: var(--text-muted);
+  }
+  .toggle-text span {
+    color: var(--cyan); cursor: pointer; font-weight: 500;
+    text-decoration: underline; text-underline-offset: 3px;
+  }
+  .toggle-text span:hover { color: var(--blue-bright); }
+  .auth-error {
+    background: rgba(239,68,68,0.1);
+    border: 1px solid rgba(239,68,68,0.3);
+    border-radius: 8px; padding: 11px 14px;
+    font-size: 12.5px; color: #fca5a5;
+    margin-bottom: 16px; display: none;
+  }
+  .auth-error.show { display: block; animation: fadeIn 0.3s ease; }
+  @keyframes fadeIn { from { opacity:0; transform: translateY(-4px); } to { opacity:1; transform: translateY(0); } }
 
-    .form-side p {
-      color: rgba(255,255,255,0.7);
-      margin-bottom: 32px;
-      font-weight: 400;
-    }
-
-    /* floating labels */
-    .input-group {
-      position: relative;
-      margin-bottom: 28px;
-    }
-
-    .input-group input {
-      width: 100%;
-      padding: 16px 16px 8px 16px;
-      background: rgba(255,255,255,0.05);
-      border: 1.5px solid rgba(255,255,255,0.08);
-      border-radius: 20px;
-      font-size: 1rem;
-      color: white;
-      outline: none;
-      transition: border 0.2s, box-shadow 0.3s, background 0.2s;
-      font-family: 'Inter', sans-serif;
-      backdrop-filter: blur(5px);
-      box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
-    }
-
-    .input-group label {
-      position: absolute;
-      left: 16px;
-      top: 16px;
-      color: rgba(255,255,255,0.5);
-      font-size: 1rem;
-      pointer-events: none;
-      transition: 0.2s ease-out;
-      font-weight: 400;
-    }
-
-    .input-group input:focus {
-      border-color: #3b82f6;
-      box-shadow: 0 0 18px #3b82f6, 0 2px 10px rgba(59,130,246,0.3);
-      background: rgba(30, 58, 138, 0.2);
-    }
-
-    .input-group input:focus + label,
-    .input-group input:not(:placeholder-shown) + label {
-      top: 4px;
-      font-size: 0.7rem;
-      color: #90caf9;
-      opacity: 0.9;
-    }
-
-    .input-group input::placeholder {
-      opacity: 0;
-    }
-
-    .btn {
-      background: rgba(59, 130, 246, 0.9);
-      border: none;
-      padding: 14px 28px;
-      border-radius: 40px;
-      font-weight: 600;
-      font-size: 1.1rem;
-      color: white;
-      backdrop-filter: blur(10px);
-      box-shadow: 0 8px 20px -6px #1e3a8a, 0 0 0 1px rgba(255,255,255,0.05);
-      cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
-      width: fit-content;
-      letter-spacing: 0.3px;
-    }
-
-    .btn:hover {
-      transform: scale(1.05);
-      background: #2563eb;
-      box-shadow: 0 12px 28px -8px #3b82f6, 0 0 20px #3b82f6;
-    }
-
-    .btn:active {
-      transform: scale(0.98);
-    }
-
-    /* sliding overlay panel */
-    .sliding-panel {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 50%;
-      height: 100%;
-      background: rgba(15, 23, 42, 0.4);
-      backdrop-filter: blur(40px);
-      -webkit-backdrop-filter: blur(40px);
-      border-radius: 36px 0 0 36px;
-      box-shadow: 10px 0 40px rgba(0,0,0,0.3), inset 0 0 0 1px rgba(59,130,246,0.2);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 40px;
-      text-align: center;
-      transition: left 0.65s cubic-bezier(0.77, 0, 0.175, 1), border-radius 0.3s;
-      z-index: 5;
-      border-right: 1px solid rgba(255,255,255,0.06);
-    }
-
-    .sliding-panel.right {
-      left: 50%;
-      border-radius: 0 36px 36px 0;
-      border-right: none;
-      border-left: 1px solid rgba(255,255,255,0.06);
-    }
-
-    .panel-content h3 {
-      font-size: 2.2rem;
-      font-weight: 700;
-      margin-bottom: 16px;
-      background: linear-gradient(to right, #fff, #b1d0ff);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-    }
-
-    .panel-content p {
-      color: rgba(255,255,255,0.7);
-      margin-bottom: 32px;
-    }
-
-    .ghost-btn {
-      background: transparent;
-      border: 2px solid rgba(255,255,255,0.25);
-      padding: 12px 30px;
-      border-radius: 40px;
-      color: white;
-      font-weight: 600;
-      backdrop-filter: blur(10px);
-      transition: 0.25s;
-      cursor: pointer;
-    }
-    .ghost-btn:hover {
-      border-color: #3b82f6;
-      background: rgba(59,130,246,0.15);
-      box-shadow: 0 0 18px #3b82f6;
-      transform: scale(1.02);
-    }
-
-    /* Forms shift animation */
-    .login-card.panel-right .forms-container {
-      transform: translateX(-10px);
-    }
-    .login-card.panel-right .login-side {
-      transform: translateX(-6px);
-      opacity: 0.9;
-    }
-    .login-card .register-side {
-      transition: all 0.5s;
-    }
-
-    /* ---------- MAIN WEBSITE ---------- */
-    .navbar {
-      position: fixed;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 90%;
-      max-width: 1300px;
-      background: rgba(15, 23, 42, 0.3);
-      backdrop-filter: blur(30px);
-      -webkit-backdrop-filter: blur(30px);
-      border-radius: 60px;
-      padding: 16px 32px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border: 1px solid rgba(59,130,246,0.15);
-      box-shadow: 0 20px 40px -10px rgba(0,0,0,0.4), 0 0 30px rgba(59,130,246,0.1);
-      z-index: 50;
-      opacity: 0;
-      transform: translateX(-50%) translateY(-20px);
-      transition: opacity 0.6s, transform 0.6s;
-    }
-
-    .navbar.visible {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-    }
-
-    .nav-links a {
-      color: rgba(255,255,255,0.8);
-      margin-left: 32px;
-      text-decoration: none;
-      font-weight: 500;
-      position: relative;
-      padding-bottom: 6px;
-    }
-    .nav-links a::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 0;
-      height: 2px;
-      background: #3b82f6;
-      box-shadow: 0 0 10px #3b82f6;
-      transition: width 0.3s;
-    }
-    .nav-links a:hover::after { width: 100%; }
-
-    .hero {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      padding: 0 8%;
-      position: relative;
-    }
-    .hero h1 {
-      font-size: 4.8rem;
-      font-weight: 800;
-      line-height: 1.1;
-      max-width: 900px;
-      background: linear-gradient(to right, #ffffff, #b1d0ff, #7ab7ff);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      letter-spacing: -0.02em;
-      text-shadow: 0 0 30px rgba(59,130,246,0.3);
-    }
-    .hero p {
-      font-size: 1.4rem;
-      opacity: 0.8;
-      margin-top: 24px;
-      max-width: 600px;
-    }
-
-    .section {
-      padding: 100px 8%;
-    }
-
-    .feature-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 32px;
-    }
-
-    .glass-card {
-      background: rgba(255, 255, 255, 0.06);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border-radius: 32px;
-      padding: 36px 28px;
-      border: 1px solid rgba(255,255,255,0.05);
-      box-shadow: 0 20px 40px -12px rgba(0,0,0,0.3), 0 0 0 1px rgba(59,130,246,0.05);
-      transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
-    }
-
-    .glass-card:hover {
-      transform: translateY(-10px);
-      box-shadow: 0 30px 50px -10px #0f172a, 0 0 30px #3b82f6;
-      border-color: rgba(59,130,246,0.3);
-    }
-
-    .dashboard-preview {
-      display: grid;
-      grid-template-columns: repeat(3,1fr);
-      gap: 24px;
-    }
-
-    .stat-card {
-      background: rgba(20, 30, 50, 0.5);
-      backdrop-filter: blur(25px);
-      padding: 24px;
-      border-radius: 24px;
-    }
-
-    /* scroll animations */
-    .fade-up {
-      opacity: 0;
-      transform: translateY(40px);
-      transition: opacity 0.8s, transform 0.8s;
-    }
-    .fade-up.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    /* cursor glow */
-    .cursor-glow {
-      position: fixed;
-      width: 600px;
-      height: 600px;
-      background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, transparent 70%);
-      border-radius: 50%;
-      pointer-events: none;
-      transform: translate(-50%, -50%);
-      z-index: 9999;
-      mix-blend-mode: screen;
-      transition: opacity 0.2s;
-    }
-
-    /* logout link */
-    .logout-btn {
-      background: none;
-      border: 1px solid rgba(255,255,255,0.2);
-      padding: 6px 18px;
-      border-radius: 40px;
-      color: white;
-      cursor: pointer;
-      backdrop-filter: blur(10px);
-    }
-
-    footer {
-      text-align: center;
-      padding: 40px;
-      opacity: 0.6;
-    }
-
-    /* particle canvas if needed, but we use orbs */
-    .logo {
-      font-weight: 700;
-      font-size: 1.8rem;
-      background: linear-gradient(135deg, #fff, #a0c8ff);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-    }
-  </style>
+  /* MAIN APP */
+  #main-site { display: none; min-height: 100vh; opacity: 0; transform: translateY(8px); transition: opacity 0.6s ease, transform 0.6s ease; }
+  #main-site.visible { display: flex; flex-direction: column; opacity: 1; transform: translateY(0); }
+  .topnav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+    height: 60px; background: rgba(6,13,31,0.92);
+    border-bottom: 1px solid var(--border-subtle);
+    backdrop-filter: blur(20px);
+    display: flex; align-items: center;
+    padding: 0 24px; gap: 16px;
+  }
+  .nav-brand { display: flex; align-items: center; gap: 10px; font-family: var(--font-display); font-size: 14px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; }
+  .nav-logo { width: 30px; height: 30px; background: linear-gradient(135deg, var(--blue-mid), var(--cyan)); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-size: 11px; font-weight: 700; color: #fff; }
+  .nav-spacer { flex: 1; }
+  .nav-role-badge { font-size: 10.5px; font-family: var(--font-mono); padding: 4px 10px; border-radius: 99px; background: var(--cyan-dim); border: 1px solid rgba(6,182,212,0.2); color: var(--cyan); letter-spacing: 1px; text-transform: uppercase; }
+  .nav-role-badge.admin { background: rgba(37,99,235,0.15); border-color: rgba(37,99,235,0.25); color: var(--blue-bright); }
+  .nav-user-name { font-size: 13px; color: var(--text-secondary); }
+  .sidebar { width: 240px; background: rgba(15,23,42,0.6); border-right: 1px solid var(--border-subtle); backdrop-filter: blur(12px); padding: 28px 0; position: fixed; top: 60px; left: 0; height: calc(100vh - 60px); overflow-y: auto; transition: transform 0.35s cubic-bezier(0.77,0,0.175,1); z-index: 100; background: rgba(15,23,42,0.9); }
+  .sidebar .nav-item { display: flex; align-items: center; gap: 11px; padding: 10px 12px; border-radius: 10px; font-size: 13.5px; font-weight: 500; color: var(--text-secondary); cursor: pointer; transition: background 0.2s ease; margin-bottom: 2px; }
+  .main-content { flex: 1; margin-left: 240px; padding: 32px; min-height: calc(100vh - 60px); }
+  .section-page { display: none; animation: fadeInUp 0.4s ease; }
+  .section-page.active { display: block; }
+  @keyframes fadeInUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 18px; margin-bottom: 28px; }
+  .stat-card { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius); padding: 22px 24px; backdrop-filter: blur(12px); }
+  .card { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius); padding: 24px; backdrop-filter: blur(12px); margin-bottom: 20px; }
+  .data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .status-badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px; border-radius: 99px; font-size: 11px; font-family: var(--font-mono); }
+  .gps-card { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 32px; text-align: center; }
+  .gps-btn { width: 140px; height: 140px; border-radius: 50%; background: linear-gradient(135deg, var(--blue-deep), var(--blue-mid)); border: 2px solid rgba(59,130,246,0.4); margin: 0 auto 24px; cursor: pointer; transition: transform 0.3s ease; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; }
+  @media (max-width: 768px) { .sidebar { transform: translateX(-100%); } .sidebar.open { transform: translateX(0); } .main-content { margin-left: 0; } }
+  .toast { position: fixed; bottom: 24px; right: 24px; z-index: 9999; padding: 14px 20px; border-radius: 10px; background: var(--bg-layer); border: 1px solid var(--border-subtle); transition: all 0.4s ease; transform: translateY(80px); opacity: 0; }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .spinner { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.2); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; display: inline-block; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
 </head>
 <body>
-  <div class="bg-orb orb1"></div>
-  <div class="bg-orb orb2"></div>
-  <div class="cursor-glow" id="cursorGlow"></div>
 
-  <!-- LOGIN / REGISTER VIEW -->
-  <div id="loginView">
-    <div class="login-card" id="loginCard">
-      <div class="forms-container" id="formsContainer">
-        <!-- left: login -->
-        <div class="form-side login-side">
-          <h2>Welcome back</h2>
-          <p>Intelligent healthcare awaits</p>
-          <div class="input-group">
-            <input type="email" id="loginEmail" placeholder="Email" value="doctor@korvil.health">
-            <label>Email</label>
-          </div>
-          <div class="input-group">
-            <input type="password" id="loginPassword" placeholder="Password" value="password123">
-            <label>Password</label>
-          </div>
-          <button class="btn" id="loginBtn">Sign In →</button>
+<div id="auth-page">
+  <div class="auth-bg"><div class="orb orb-1"></div><div class="orb orb-2"></div><div class="orb orb-3"></div></div>
+  <div class="auth-card">
+    <div class="auth-brand"><div class="auth-brand-logo">KV</div><div><div class="auth-brand-name">Korvil</div><span class="auth-brand-tag">Workforce Attendance System</span></div></div>
+    <div id="auth-title" class="auth-title">Admin Access</div>
+    <div id="auth-sub" class="auth-sub">Control and monitor workforce operations</div>
+    <div id="auth-error" class="auth-error"></div>
+    <div class="form-window" id="formWindow">
+      <div id="form-slide" class="form-slide">
+        <div class="auth-panel" id="admin-panel">
+          <div class="role-indicator admin-mode"><span class="dot"></span> Admin Mode</div>
+          <button class="btn-google" onclick="handleAdminGoogle()"><svg class="google-icon" width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg> Sign in with Google</button>
+          <div class="divider">or use credentials</div>
+          <div class="field-group"><label class="field-label">Admin Email</label><input type="email" id="admin-email" class="field-input" placeholder="admin@korvil.health"/></div>
+          <div class="field-group"><label class="field-label">Password</label><input type="password" id="admin-pass" class="field-input" placeholder="••••••••"/></div>
+          <button class="btn-primary" onclick="handleAdminEmailLogin()"><span id="admin-btn-text">Enter Admin Panel</span><span id="admin-spinner" style="display:none" class="spinner"></span> →</button>
         </div>
-        <!-- right: register -->
-        <div class="form-side register-side">
-          <h2>Create account</h2>
-          <p>Join the future of HealthTech</p>
-          <div class="input-group">
-            <input type="text" placeholder="Full name" value="Alex Rivera">
-            <label>Full name</label>
-          </div>
-          <div class="input-group">
-            <input type="email" placeholder="Email" value="alex@korvil.health">
-            <label>Email</label>
-          </div>
-          <div class="input-group">
-            <input type="password" placeholder="Password">
-            <label>Password</label>
-          </div>
-          <button class="btn" id="registerBtn">Get started</button>
-        </div>
-      </div>
-      <!-- sliding overlay panel -->
-      <div class="sliding-panel" id="slidingPanel">
-        <div class="panel-content" id="panelContent">
-          <h3>New here?</h3>
-          <p>Enter your personal details and start the journey with Korvil</p>
-          <button class="ghost-btn" id="switchToRegister">Sign Up</button>
+        <div class="auth-panel" id="employee-panel">
+          <div class="role-indicator"><span class="dot"></span> Employee Mode</div>
+          <button class="btn-google" onclick="handleEmployeeGoogle()"><svg class="google-icon" width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg> Sign in with Google</button>
+          <div class="divider">or use credentials</div>
+          <div class="field-group"><label class="field-label">Employee Email</label><input type="email" id="emp-email" class="field-input" placeholder="you@korvil.health"/></div>
+          <div class="field-group"><label class="field-label">Password</label><input type="password" id="emp-pass" class="field-input" placeholder="••••••••"/></div>
+          <button class="btn-primary" onclick="handleEmployeeEmailLogin()"><span id="emp-btn-text">Enter Workspace</span><span id="emp-spinner" style="display:none" class="spinner"></span> →</button>
         </div>
       </div>
     </div>
+    <div id="toggle-text" class="toggle-text">Need employee access? <span onclick="switchToEmployee()">Employee Access</span></div>
   </div>
+</div>
 
-  <!-- MAIN WEBSITE (hidden initially) -->
-  <div id="mainApp">
-    <nav class="navbar" id="navbar">
-      <div class="logo">⚕️ Korvil</div>
-      <div class="nav-links">
-        <a href="#">Platform</a>
-        <a href="#">Solutions</a>
-        <a href="#">Research</a>
-        <a href="#">Dashboard</a>
-        <button class="logout-btn" id="logoutBtn">Log out</button>
-      </div>
-    </nav>
+<div id="main-site">
+  <nav class="topnav"><div class="hamburger" id="hamburger" onclick="toggleSidebar()"><span></span><span></span><span></span></div><div class="nav-brand"><div class="nav-logo">KV</div>Korvil</div><div class="nav-spacer"></div><span id="nav-role-badge" class="nav-role-badge">Employee</span><span id="nav-user-name" class="nav-user-name">—</span></nav>
+  <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+  <div class="app-layout"><aside class="sidebar" id="sidebar">
+    <div id="admin-nav" style="display:none"><div class="sidebar-section"><div class="nav-item active" onclick="showSection('admin-dashboard')">📊 Dashboard</div></div><div class="sidebar-section"><div class="nav-item" onclick="showSection('admin-employees')">👥 Employees</div><div class="nav-item" onclick="showSection('admin-attendance')">📋 Attendance</div><div class="nav-item" onclick="showSection('admin-messages')">✉️ Messages</div><div class="nav-item" onclick="showSection('admin-location')">📍 Geofence</div></div><div class="sidebar-section"><div class="nav-item logout" onclick="handleLogout()">🚪 Logout</div></div></div>
+    <div id="employee-nav" style="display:none"><div class="sidebar-section"><div class="nav-item active" onclick="showSection('emp-dashboard')">📊 Dashboard</div><div class="nav-item" onclick="showSection('emp-mark')">📍 Mark Attendance</div><div class="nav-item" onclick="showSection('emp-records')">📜 My Attendance</div><div class="nav-item logout" onclick="handleLogout()">🚪 Logout</div></div></div>
+  </aside>
+  <main class="main-content">
+    <div class="section-page active" id="admin-dashboard"><div class="page-header"><div class="page-title">Dashboard</div><div class="page-sub">Workforce overview — <span id="dash-date"></span></div></div><div class="stats-grid"><div class="stat-card"><div class="stat-label">Total Employees</div><div class="stat-value blue" id="stat-total">0</div></div><div class="stat-card"><div class="stat-label">Present Today</div><div class="stat-value green" id="stat-present">0</div></div><div class="stat-card"><div class="stat-label">Absent Today</div><div class="stat-value red" id="stat-absent">0</div></div><div class="stat-card"><div class="stat-label">On Leave</div><div class="stat-value" id="stat-leave">0</div></div></div><div class="card"><div class="card-title">Today's Activity</div><div id="activity-timeline"></div></div></div>
+    <div class="section-page" id="admin-employees"><div class="page-header"><div class="page-title">Employee Management</div></div><div class="card"><div class="card-title">Add Employee</div><div class="form-row"><input type="text" id="new-emp-name" placeholder="Full name"><input type="email" id="new-emp-email" placeholder="Email"></div><div class="form-row"><select id="new-emp-dept"><option>Engineering</option><option>Clinical AI</option><option>Product</option></select><input type="password" id="new-emp-pass" placeholder="Password"></div><button class="btn btn-blue" onclick="addEmployee()">+ Register</button></div><div class="card"><div class="card-title">Employees</div><div id="employees-table"></div></div></div>
+    <div class="section-page" id="admin-attendance"><div class="page-header"><div class="page-title">Attendance Monitor</div></div><div><input type="date" id="att-date-filter"><button onclick="filterAttendance()">Filter</button><button onclick="loadAllAttendance()">All</button></div><div class="card"><div id="attendance-table"></div></div></div>
+    <div class="section-page" id="admin-messages"><div class="page-header"><div class="page-title">Messages</div></div><div class="card"><textarea id="admin-msg-text" placeholder="Broadcast message"></textarea><button class="btn-blue" onclick="sendAdminMessage()">Send</button><div id="messages-list"></div></div></div>
+    <div class="section-page" id="admin-location"><div class="page-header"><div class="page-title">Geofence Config</div></div><div class="card"><input type="number" id="office-lat" placeholder="Latitude"><input type="number" id="office-lng" placeholder="Longitude"><input type="number" id="office-radius" placeholder="Radius (m)"><button class="btn-blue" onclick="saveLocationSettings()">Save</button><div id="current-location-config"></div></div></div>
+    <div class="section-page" id="emp-dashboard"><div class="page-header"><div class="page-title">My Dashboard</div><div class="page-sub">Welcome, <span id="emp-name-display">—</span></div></div><div class="stats-grid"><div class="stat-card"><div class="stat-label">Present this month</div><div class="stat-value green" id="my-present">0</div></div><div class="stat-card"><div class="stat-label">Today's status</div><div class="stat-value" id="today-status">—</div></div></div><div class="card"><div id="emp-timeline"></div></div></div>
+    <div class="section-page" id="emp-mark"><div class="page-header"><div class="page-title">Mark Attendance</div></div><div class="gps-card"><button class="gps-btn" id="gps-btn" onclick="markAttendance()"><span style="font-size:28px">📍</span><span id="gps-btn-label">Mark Present</span></button><div class="gps-status" id="gps-status"></div><div class="gps-coords" id="gps-coords"></div><div class="gps-result" id="gps-result"></div></div><div class="card"><label>Date</label><input type="date" id="absence-date"><textarea id="absence-reason" placeholder="Reason for absence"></textarea><button onclick="reportAbsence()">Report Absence</button></div></div>
+    <div class="section-page" id="emp-records"><div class="page-header"><div class="page-title">My Attendance History</div></div><div id="my-att-table"></div></div>
+  </main></div>
+</div>
+<div class="toast" id="toast"></div>
 
-    <section class="hero">
-      <div>
-        <h1>Building Intelligent<br>Healthcare Systems</h1>
-        <p>AI‑native infrastructure for next‑gen diagnostics, real‑time monitoring, and precision care.</p>
-      </div>
-    </section>
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+import { getFirestore, doc, getDoc, setDoc, collection, getDocs, query, where, orderBy, serverTimestamp, addDoc, deleteDoc, updateDoc } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+const firebaseConfig = {  
+     apiKey: "AIzaSyAOzm--Noa2IzHVhCCDqQsuGDUC9Jk6biY",
+     authDomain: "korvil-a3320.firebaseapp.com",
+     projectId: "korvil-a3320",
+     storageBucket: "korvil-a3320.firebasestorage.app",
+     messagingSenderId: "281032474155",
+     appId: "1:281032474155:web:a775bed1432b4eadd8f46e", };
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const googleProvider = new GoogleAuthProvider();
+const ADMIN_EMAILS = ["mithunsabari17@gmail.com","admin2@gmail.com","admin3@gmail.com"];
+let currentUser = null, currentRole = null, isAdminMode = true;
 
-    <section class="section">
-      <h2 style="font-size: 3rem; margin-bottom: 48px; font-weight: 700;">Why Korvil</h2>
-      <div class="feature-grid">
-        <div class="glass-card fade-up">
-          <div style="font-size: 2.5rem; margin-bottom: 20px;">🧬</div>
-          <h3>Genomic AI</h3>
-          <p style="opacity: 0.8;">Deep learning models that interpret genetic markers in seconds.</p>
-        </div>
-        <div class="glass-card fade-up" style="transition-delay: 0.1s;">
-          <div style="font-size: 2.5rem; margin-bottom: 20px;">🛡️</div>
-          <h3>Zero‑trust security</h3>
-          <p style="opacity: 0.8;">HIPAA & GDPR compliant, encrypted at the edge.</p>
-        </div>
-        <div class="glass-card fade-up" style="transition-delay: 0.2s;">
-          <div style="font-size: 2.5rem; margin-bottom: 20px;">📈</div>
-          <h3>Predictive analytics</h3>
-          <p style="opacity: 0.8;">Real‑time risk scoring and early warning systems.</p>
-        </div>
-      </div>
-    </section>
+function showToast(msg, type=''){ const t=document.getElementById('toast'); t.innerHTML=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000); }
+function showError(msg){ const el=document.getElementById('auth-error'); el.textContent=msg; el.classList.add('show'); setTimeout(()=>el.classList.remove('show'),5000); }
+function hideError(){ document.getElementById('auth-error').classList.remove('show'); }
+function today(){ return new Date().toISOString().split('T')[0]; }
+function formatDate(d){ if(!d) return '—'; const dt=d.toDate?d.toDate():new Date(d); return dt.toLocaleDateString(); }
+function formatTime(d){ if(!d) return '—'; const dt=d.toDate?d.toDate():new Date(d); return dt.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}); }
 
-    <!-- DASHBOARD PREVIEW (inside page) -->
-    <section class="section">
-      <h2 style="font-size: 2.5rem; margin-bottom: 32px;">Live overview</h2>
-      <div class="dashboard-preview">
-        <div class="stat-card glass-card">
-          <div style="opacity:0.7">Active patients</div>
-          <div style="font-size: 3rem; font-weight: 700;">2,482</div>
-          <div style="color: #60a5fa;">↑ 12% this week</div>
-        </div>
-        <div class="stat-card glass-card">
-          <div style="opacity:0.7">AI diagnostics</div>
-          <div style="font-size: 3rem; font-weight: 700;">98.7%</div>
-          <div style="color: #60a5fa;">accuracy</div>
-        </div>
-        <div class="stat-card glass-card">
-          <div style="opacity:0.7">Avg. response</div>
-          <div style="font-size: 3rem; font-weight: 700;">1.4s</div>
-          <div style="color: #60a5fa;">real‑time</div>
-        </div>
-      </div>
-      <div style="margin-top: 40px; display: flex; gap: 20px;">
-        <div class="glass-card" style="flex:1; display: flex; align-items: center; gap:20px;">
-          <span style="font-size: 2rem;">🏥</span> <span>Connected to 12 hospital networks · live sync</span>
-        </div>
-        <div class="glass-card" style="flex:1;">📋 Recent reports: cardiac, neuro, oncology</div>
-      </div>
-    </section>
+// ----- SMOOTH SLIDING & FADE (first snippet logic) -----
+function updateAuthUIWithFade(isAdmin) {
+  const titleEl = document.getElementById('auth-title');
+  const subEl = document.getElementById('auth-sub');
+  const toggleText = document.getElementById('toggle-text');
+  titleEl.style.opacity = '0'; subEl.style.opacity = '0';
+  setTimeout(() => {
+    if (isAdmin) {
+      titleEl.textContent = "Admin Access";
+      subEl.textContent = "Control and monitor workforce operations";
+      toggleText.innerHTML = 'Need employee access? <span onclick="switchToEmployee()">Employee Access</span>';
+    } else {
+      titleEl.textContent = "Employee Access";
+      subEl.textContent = "Mark attendance and view records";
+      toggleText.innerHTML = 'Admin access required? <span onclick="switchToAdmin()">Admin Access</span>';
+    }
+    titleEl.style.opacity = '1'; subEl.style.opacity = '1';
+  }, 180);
+}
+function resizeFormWindowToPanel(panelElement) {
+  const formWindow = document.getElementById('formWindow');
+  if (panelElement) formWindow.style.height = panelElement.offsetHeight + 'px';
+}
+function syncContainerHeightAndTransform() {
+  const adminPanel = document.getElementById('admin-panel');
+  const employeePanel = document.getElementById('employee-panel');
+  const formWindow = document.getElementById('formWindow');
+  const slide = document.getElementById('form-slide');
+  if (isAdminMode) {
+    formWindow.style.height = adminPanel.offsetHeight + 'px';
+    slide.style.transform = 'translateY(0px)';
+  } else {
+    const adminHeight = adminPanel.offsetHeight;
+    formWindow.style.height = employeePanel.offsetHeight + 'px';
+    slide.style.transform = `translateY(-${adminHeight}px)`;
+  }
+}
+window.switchToEmployee = function() {
+  if (!isAdminMode) return;
+  const adminPanel = document.getElementById('admin-panel');
+  const employeePanel = document.getElementById('employee-panel');
+  const formWindow = document.getElementById('formWindow');
+  const slide = document.getElementById('form-slide');
+  const adminH = adminPanel.offsetHeight;
+  formWindow.style.height = adminH + 'px';
+  requestAnimationFrame(() => {
+    formWindow.style.height = employeePanel.offsetHeight + 'px';
+    slide.style.transform = `translateY(-${adminH}px)`;
+    isAdminMode = false;
+    updateAuthUIWithFade(false);
+    hideError();
+  });
+};
+window.switchToAdmin = function() {
+  if (isAdminMode) return;
+  const adminPanel = document.getElementById('admin-panel');
+  const employeePanel = document.getElementById('employee-panel');
+  const formWindow = document.getElementById('formWindow');
+  const slide = document.getElementById('form-slide');
+  const empH = employeePanel.offsetHeight;
+  formWindow.style.height = empH + 'px';
+  requestAnimationFrame(() => {
+    formWindow.style.height = adminPanel.offsetHeight + 'px';
+    slide.style.transform = `translateY(0px)`;
+    isAdminMode = true;
+    updateAuthUIWithFade(true);
+    hideError();
+  });
+};
+window.addEventListener('resize', () => { if (document.getElementById('auth-page').style.display !== 'none') syncContainerHeightAndTransform(); });
+window.addEventListener('load', () => { syncContainerHeightAndTransform(); });
 
-    <footer>
-      <p>© 2026 Korvil HealthTech — precision at scale</p>
-    </footer>
-  </div>
+// ----- FIREBASE AUTH & HELPERS (from second snippet) -----
+function handleEntry(user, role) {
+  currentUser = user; currentRole = role;
+  const authPage = document.getElementById('auth-page');
+  const mainSite = document.getElementById('main-site');
+  authPage.classList.add('exit');
+  setTimeout(() => {
+    authPage.style.display = 'none';
+    mainSite.classList.add('visible');
+    setupDashboard(role);
+  }, 800);
+}
+async function ensureAdminDoc(user){ const ref=doc(db,'users',user.uid); if(!(await getDoc(ref)).exists()) await setDoc(ref,{uid:user.uid,name:user.displayName||'Admin',email:user.email,role:'admin',department:'Administration',createdAt:serverTimestamp()}); }
+window.handleAdminGoogle = async () => { hideError(); try { const res=await signInWithPopup(auth,googleProvider); if(!ADMIN_EMAILS.includes(res.user.email)){ await signOut(auth); showError('Unauthorized admin email.'); return; } await ensureAdminDoc(res.user); handleEntry(res.user,'admin'); } catch(e){ showError(e.message); } };
+window.handleAdminEmailLogin = async () => { const email=document.getElementById('admin-email').value.trim(), pass=document.getElementById('admin-pass').value; if(!email||!pass){ showError('Enter credentials'); return; } if(!ADMIN_EMAILS.includes(email)){ showError('Not admin email'); return; } try{ const cred=await signInWithEmailAndPassword(auth,email,pass); await ensureAdminDoc(cred.user); handleEntry(cred.user,'admin'); }catch(e){ showError(e.message); } };
+window.handleEmployeeGoogle = async () => { hideError(); try { const res=await signInWithPopup(auth,googleProvider); const snap=await getDoc(doc(db,'users',res.user.uid)); if(!snap.exists()){ await signOut(auth); showError('Not registered as employee.'); return; } if(snap.data().role==='admin'){ await signOut(auth); showError('Use admin panel.'); return; } handleEntry(res.user,'employee'); } catch(e){ showError(e.message); } };
+window.handleEmployeeEmailLogin = async () => { const email=document.getElementById('emp-email').value.trim(), pass=document.getElementById('emp-pass').value; if(!email||!pass){ showError('Enter credentials'); return; } try{ const cred=await signInWithEmailAndPassword(auth,email,pass); const snap=await getDoc(doc(db,'users',cred.user.uid)); if(!snap.exists()){ await signOut(auth); showError('Employee not found.'); return; } handleEntry(cred.user,'employee'); }catch(e){ showError(e.message); } };
+window.handleLogout = async () => { await signOut(auth); document.getElementById('main-site').classList.remove('visible'); document.getElementById('auth-page').style.display='flex'; document.getElementById('auth-page').classList.remove('exit'); switchToAdmin(); };
 
-  <script>
-    (function(){
-      "use strict";
+function setupDashboard(role){
+  document.getElementById('nav-role-badge').textContent=role==='admin'?'Admin':'Employee'; document.getElementById('nav-user-name').textContent=currentUser.displayName||currentUser.email;
+  if(role==='admin'){ document.getElementById('admin-nav').style.display='block'; document.getElementById('employee-nav').style.display='none'; showSection('admin-dashboard'); loadAdminDashboard(); } else { document.getElementById('admin-nav').style.display='none'; document.getElementById('employee-nav').style.display='block'; showSection('emp-dashboard'); loadEmployeeDashboard(); }
+  document.getElementById('dash-date').textContent=new Date().toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long'});
+}
+window.showSection=function(id){ document.querySelectorAll('.section-page').forEach(p=>p.classList.remove('active')); document.getElementById(id).classList.add('active'); if(id==='admin-employees') loadEmployees(); if(id==='admin-attendance') loadAllAttendance(); if(id==='admin-messages') loadMessages(); if(id==='admin-location') loadLocationConfig(); if(id==='emp-records') loadMyAttendance(); closeSidebar(); };
+window.toggleSidebar=function(){ document.getElementById('sidebar').classList.toggle('open'); }; window.closeSidebar=function(){ document.getElementById('sidebar').classList.remove('open'); };
 
-      // Elements
-      const loginView = document.getElementById('loginView');
-      const mainApp = document.getElementById('mainApp');
-      const loginCard = document.getElementById('loginCard');
-      const slidingPanel = document.getElementById('slidingPanel');
-      const panelContent = document.getElementById('panelContent');
-      const switchBtn = document.getElementById('switchToRegister');
-      const loginBtn = document.getElementById('loginBtn');
-      const registerBtn = document.getElementById('registerBtn');
-      const logoutBtn = document.getElementById('logoutBtn');
-      const navbar = document.getElementById('navbar');
-      const cursorGlow = document.getElementById('cursorGlow');
-
-      // State
-      let isPanelRight = false;
-
-      // Helper: update panel text / button
-      function updatePanelContent() {
-        if (isPanelRight) {
-          panelContent.innerHTML = `
-            <h3>One of us?</h3>
-            <p>Sign in to continue with Korvil intelligence</p>
-            <button class="ghost-btn" id="switchToLogin">Sign In</button>
-          `;
-          document.getElementById('switchToLogin').addEventListener('click', togglePanel);
-        } else {
-          panelContent.innerHTML = `
-            <h3>New here?</h3>
-            <p>Enter your personal details and start the journey with Korvil</p>
-            <button class="ghost-btn" id="switchToRegister">Sign Up</button>
-          `;
-          document.getElementById('switchToRegister').addEventListener('click', togglePanel);
-        }
-      }
-
-      function togglePanel() {
-        isPanelRight = !isPanelRight;
-        if (isPanelRight) {
-          slidingPanel.classList.add('right');
-          loginCard.classList.add('panel-right');
-        } else {
-          slidingPanel.classList.remove('right');
-          loginCard.classList.remove('panel-right');
-        }
-        updatePanelContent();
-      }
-
-      // Initial panel listener
-      switchBtn.addEventListener('click', togglePanel);
-
-      // Login transition (simulate auth)
-      function performLogin() {
-        localStorage.setItem('korvil_loggedIn', 'true');
-        // animate out login
-        loginView.classList.add('hidden-login');
-        setTimeout(() => {
-          loginView.style.display = 'none';
-          mainApp.style.display = 'block';
-          // force reflow
-          void mainApp.offsetWidth;
-          mainApp.classList.add('visible-app');
-          navbar.classList.add('visible');
-          // scroll reveal setup
-          initScrollReveal();
-        }, 700);
-      }
-
-      loginBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        performLogin();
-      });
-      registerBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        performLogin(); // register also logs in
-      });
-
-      // Logout
-      logoutBtn.addEventListener('click', () => {
-        localStorage.removeItem('korvil_loggedIn');
-        mainApp.classList.remove('visible-app');
-        navbar.classList.remove('visible');
-        loginView.style.display = 'flex';
-        loginView.classList.remove('hidden-login');
-        mainApp.style.display = 'none';
-        // reset panel to left
-        isPanelRight = false;
-        slidingPanel.classList.remove('right');
-        loginCard.classList.remove('panel-right');
-        updatePanelContent();
-      });
-
-      // Check localStorage on load
-      if (localStorage.getItem('korvil_loggedIn') === 'true') {
-        loginView.style.display = 'none';
-        mainApp.style.display = 'block';
-        mainApp.classList.add('visible-app');
-        navbar.classList.add('visible');
-      } else {
-        mainApp.style.display = 'none';
-        loginView.style.display = 'flex';
-      }
-
-      // Scroll animations (Intersection Observer)
-      function initScrollReveal() {
-        const fadeElements = document.querySelectorAll('.fade-up');
-        const observer = new IntersectionObserver((entries) => {
-          entries.forEach(entry => {
-            if (entry.isIntersecting) {
-              entry.target.classList.add('visible');
-            }
-          });
-        }, { threshold: 0.15, rootMargin: '0px 0px -10px 0px' });
-        fadeElements.forEach(el => observer.observe(el));
-
-        // Navbar appearance on scroll
-        window.addEventListener('scroll', () => {
-          if (window.scrollY > 50) {
-            navbar.classList.add('visible');
-          } else {
-            navbar.classList.add('visible'); // always visible after login, but fine
-          }
-        });
-      }
-
-      // Parallax effect for background orbs (mousemove)
-      document.addEventListener('mousemove', (e) => {
-        const x = e.clientX / window.innerWidth;
-        const y = e.clientY / window.innerHeight;
-        const orbs = document.querySelectorAll('.bg-orb');
-        if(orbs[0]) {
-          orbs[0].style.transform = `translate(${x * 20}px, ${y * 20}px) scale(1.05)`;
-          orbs[1].style.transform = `translate(${-x * 15}px, ${-y * 15}px) scale(1.1)`;
-        }
-        // cursor glow
-        if(cursorGlow) {
-          cursorGlow.style.left = e.clientX + 'px';
-          cursorGlow.style.top = e.clientY + 'px';
-        }
-      });
-
-      // Extra micro interactions: input glow already via CSS, plus scale on cards
-      // Add hover ripple effect on buttons (css handles)
-
-      // Floating labels already via CSS.
-
-      // Smooth scroll behavior
-      document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function(e) {
-          e.preventDefault();
-        });
-      });
-
-      // Initialize panel text
-      updatePanelContent();
-
-      // Prefill values to look good
-
-      // Stagger fade on load for main if already logged in
-      if (mainApp.classList.contains('visible-app')) {
-        initScrollReveal();
-      }
-
-      // Manual trigger for parallax scrolling: background moves slower (css trick)
-      // We have fixed orbs, they move with mouse already.
-
-      // Add noise texture via pseudo, already in body.
-
-      // Additional: simulate text reveal effect (mask) can be done but we have gradient.
-
-      // set logout button also in navbar
-    })();
-  </script>
-  <!-- ensure fade-up elements are observed after dynamic content -->
-  <script>
-    (function secondary(){
-      // re-run observer if needed
-      if (document.readyState === 'complete') {
-        if (document.querySelector('#mainApp.visible-app')) {
-          // reinit
-          const fadeElements = document.querySelectorAll('.fade-up');
-          const obs = new IntersectionObserver((entries) => {
-            entries.forEach(entry => { if(entry.isIntersecting) entry.target.classList.add('visible'); });
-          }, { threshold: 0.15 });
-          fadeElements.forEach(el => obs.observe(el));
-        }
-      }
-    })();
-  </script>
+async function loadAdminDashboard(){
+  const usersSnap=await getDocs(query(collection(db,'users'),where('role','==','employee')));
+  document.getElementById('stat-total').textContent=usersSnap.size;
+  const attSnap=await getDocs(query(collection(db,'attendance'),where('date','==',today())));
+  let present=0,absent=0,leave=0; attSnap.forEach(d=>{ const s=d.data().status; if(s==='present') present++; else if(s==='absent') absent++; else if(s==='leave') leave++; });
+  document.getElementById('stat-present').textContent=present; document.getElementById('stat-absent').textContent=absent; document.getElementById('stat-leave').textContent=leave;
+  const tl=document.getElementById('activity-timeline'); tl.innerHTML=''; attSnap.forEach(d=>{ const a=d.data(); tl.innerHTML+=`<div class="timeline-item"><div class="timeline-time">${formatTime(a.time)}</div><div class="timeline-text">${a.name||a.uid} — ${a.status}</div></div>`; });
+  if(!attSnap.size) tl.innerHTML='<div class="timeline-text">No activity</div>';
+}
+async function loadEmployees(){ const snap=await getDocs(query(collection(db,'users'),where('role','==','employee'))); let html='<table class="data-table"><tr><th>Name</th><th>Email</th><th>Action</th></tr>'; snap.forEach(d=>{ const e=d.data(); html+=`<tr><td>${e.name}</td><td>${e.email}</td><td><button class="btn-sm btn-danger" onclick="confirmDeleteEmp('${e.uid}')">Remove</button></td></tr>`; }); document.getElementById('employees-table').innerHTML=html+'</table>'; }
+window.addEmployee=async()=>{ const name=document.getElementById('new-emp-name').value, email=document.getElementById('new-emp-email').value, dept=document.getElementById('new-emp-dept').value, pass=document.getElementById('new-emp-pass').value; if(!name||!email||!dept||!pass){ showToast('All fields required','error'); return; } const uid='emp_'+Date.now(); await setDoc(doc(db,'users',uid),{uid,name,email,role:'employee',department:dept,createdAt:serverTimestamp()}); showToast('Employee added','success'); loadEmployees(); };
+window.confirmDeleteEmp=async(uid)=>{ if(confirm('Remove employee?')){ await deleteDoc(doc(db,'users',uid)); loadEmployees(); loadAdminDashboard(); } };
+window.loadAllAttendance=async()=>{ const snap=await getDocs(query(collection(db,'attendance'),orderBy('time','desc'))); let html='<table class="data-table"><tr><th>Name</th><th>Date</th><th>Status</th></tr>'; snap.forEach(d=>{ const a=d.data(); html+=`<tr><td>${a.name||a.uid}</td><td>${a.date}</td><td>${a.status}</td></tr>`; }); document.getElementById('attendance-table').innerHTML=html+'</table>'; };
+window.filterAttendance=async()=>{ const date=document.getElementById('att-date-filter').value; if(!date) return; const snap=await getDocs(query(collection(db,'attendance'),where('date','==',date))); let html='<table class="data-table"><tr><th>Name</th><th>Status</th></tr>'; snap.forEach(d=>{ const a=d.data(); html+=`<tr><td>${a.name||a.uid}</td><td>${a.status}</td></tr>`; }); document.getElementById('attendance-table').innerHTML=html+'</table>'; };
+window.sendAdminMessage=async()=>{ const text=document.getElementById('admin-msg-text').value; if(!text) return; await addDoc(collection(db,'messages'),{uid:currentUser.uid,senderName:'Admin',text,date:serverTimestamp(),type:'broadcast'}); showToast('Message sent'); loadMessages(); };
+async function loadMessages(){ const snap=await getDocs(query(collection(db,'messages'),orderBy('date','desc'))); let html=''; snap.forEach(d=>{ const m=d.data(); html+=`<div class="msg-item"><b>${m.senderName}</b><br>${m.text}<small>${formatDate(m.date)}</small></div>`; }); document.getElementById('messages-list').innerHTML=html||'No messages'; }
+window.saveLocationSettings=async()=>{ const lat=parseFloat(document.getElementById('office-lat').value), lng=parseFloat(document.getElementById('office-lng').value), radius=parseInt(document.getElementById('office-radius').value); if(isNaN(lat)||isNaN(lng)||isNaN(radius)) return; await setDoc(doc(db,'officeSettings','main'),{lat,lng,radius}); showToast('Geofence saved'); loadLocationConfig(); };
+async function loadLocationConfig(){ const snap=await getDoc(doc(db,'officeSettings','main')); if(snap.exists()){ const d=snap.data(); document.getElementById('current-location-config').innerHTML=`Lat: ${d.lat}, Lng: ${d.lng}, Radius: ${d.radius}m`; } }
+async function loadEmployeeDashboard(){ const userDoc=await getDoc(doc(db,'users',currentUser.uid)); const name=userDoc.exists()?userDoc.data().name:currentUser.email; document.getElementById('emp-name-display').textContent=name; const snap=await getDocs(query(collection(db,'attendance'),where('uid','==',currentUser.uid))); let present=0; let todayStatus='—'; snap.forEach(d=>{ const a=d.data(); if(a.date===today()) todayStatus=a.status; if(a.date.startsWith(today().slice(0,7)) && a.status==='present') present++; }); document.getElementById('my-present').textContent=present; document.getElementById('today-status').textContent=todayStatus==='—'?'Not marked':todayStatus; const tl=document.getElementById('emp-timeline'); tl.innerHTML=''; snap.forEach(d=>{ const a=d.data(); tl.innerHTML+=`<div>${a.date}: ${a.status}</div>`; }); }
+window.markAttendance=async()=>{ const btn=document.getElementById('gps-btn'); btn.classList.add('scanning'); navigator.geolocation.getCurrentPosition(async pos=>{ const lat=pos.coords.latitude, lng=pos.coords.longitude; const officeSnap=await getDoc(doc(db,'officeSettings','main')); if(!officeSnap.exists()){ showToast('Geofence missing'); return; } const office=officeSnap.data(); const R=6371000; const dLat=(office.lat-lat)*Math.PI/180, dLon=(office.lng-lng)*Math.PI/180; const a=Math.sin(dLat/2)**2+Math.cos(lat*Math.PI/180)*Math.cos(office.lat*Math.PI/180)*Math.sin(dLon/2)**2; const dist=R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)); const inZone=dist<=office.radius; const userDoc=await getDoc(doc(db,'users',currentUser.uid)); const empName=userDoc.exists()?userDoc.data().name:currentUser.email; await addDoc(collection(db,'attendance'),{uid:currentUser.uid,name:empName,email:currentUser.email,date:today(),status:inZone?'present':'absent',time:serverTimestamp(),lat,lng,distance:Math.round(dist)}); showToast(inZone?'Present marked ✓':'Outside zone - marked absent',inZone?'success':'error'); loadEmployeeDashboard(); btn.classList.remove('scanning'); }, err=>{ showToast('GPS failed','error'); btn.classList.remove('scanning'); }); };
+window.reportAbsence=async()=>{ const date=document.getElementById('absence-date').value, reason=document.getElementById('absence-reason').value; if(!date||!reason){ showToast('Date and reason required','error'); return; } const userDoc=await getDoc(doc(db,'users',currentUser.uid)); const name=userDoc.exists()?userDoc.data().name:currentUser.email; await addDoc(collection(db,'attendance'),{uid:currentUser.uid,name,email:currentUser.email,date,status:'leave',time:serverTimestamp(),reason}); showToast('Absence reported','success'); loadEmployeeDashboard(); };
+async function loadMyAttendance(){ const snap=await getDocs(query(collection(db,'attendance'),where('uid','==',currentUser.uid))); let html='<table class="data-table"><tr><th>Date</th><th>Status</th><th>Reason</th></tr>'; snap.forEach(d=>{ const a=d.data(); html+=`<tr><td>${a.date}</td><td>${a.status}</td><td>${a.reason||'—'}</td></tr>`; }); document.getElementById('my-att-table').innerHTML=html+'</table>'; }
+onAuthStateChanged(auth, async user=>{ if(!user) return; const snap=await getDoc(doc(db,'users',user.uid)); if(!snap.exists()){ await signOut(auth); return; } const role=snap.data().role; if(ADMIN_EMAILS.includes(user.email) && role!=='admin') await signOut(auth); else handleEntry(user,role); });
+</script>
 </body>
 </html>
